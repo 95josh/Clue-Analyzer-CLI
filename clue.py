@@ -1,33 +1,6 @@
 from enum import Enum
-#Created by Joshua Stahl for CIS156 at SMCC
+#Created by Joshua Stahl for CIS156 at SMCC for his Final Project
 
-
-class Rooms(Enum):
-    Ball_Room = 0
-    Billiard_Room = 1
-    Conservatory = 2
-    Dining_Room = 3
-    Hall = 4
-    Kitchen = 5
-    Lounge = 6
-    Library = 7
-    Study = 8
-
-class People(Enum):
-    Mrs_White = 0
-    Mrs_Peacock = 1
-    Professor_Plum = 2
-    Colonel_Mustard = 3
-    Miss_Scarlett = 4
-    Reverend_Green = 5
-
-class Weapons(Enum):
-    Knife = 0
-    Revolver = 1
-    Rope = 2
-    Wrench = 3
-    Candlestick = 4
-    Lead_Pipe = 5
 
 class CluePlayer():
 
@@ -136,7 +109,7 @@ class CluePlayer():
         else:
             raise ValueError("Index not valid")
 
-    def setPeople(self, idx, value):
+    def setPerson(self, idx, value):
         #check to make sure idx is within an appropriate range.
         if idx >= 0 or idx < 6:
             #value shouldn't be outside x, y, and -
@@ -147,7 +120,7 @@ class CluePlayer():
         else:
             raise ValueError("Index not valid")
 
-    def setWeapons(self, idx, value):
+    def setWeapon(self, idx, value):
         #check to make sure idx is within an appropriate range.
         if idx >= 0 or idx < 6:
             #value shouldn't be outside x, y, and -
@@ -198,6 +171,16 @@ class CluePlayer():
              
         return result
 
+    def getRoom(self, idx):
+        return self.__rooms[idx]
+
+    def getPerson(self, idx):
+        return self.__rooms[idx]
+
+    def getWeapon(self, idx):
+        return self.__rooms[idx]
+
+
     def getRooms(self):
         return self.__rooms
 
@@ -224,30 +207,21 @@ class CluePlayer():
                 'people':self.getPeople(), 'weapons':self.getWeapons()}
         
     def __str__(self):
-        content ="PLAYER: " + self.getName().upper() + "\n\n" + \
-               "ROOMS" + "\n" + "============" + "\n\n"
 
-        rooms = ""
-        for i in range(0, 9):
-            rooms += (self.getRoomNames()[i] + " (" + self.__rooms[i] + ")\n")
+        content = "PLAYER: " + self.getName().upper() + "\n\n" + \
+               "ROOMS".ljust(19) + "PEOPLE".ljust(21) + "WEAPONS".ljust(17) + \
+               "\n" + "============".ljust(19) + "============".ljust(21) + \
+               "==========".ljust(17) + "\n"
 
-        content += rooms
-        content += "\nPEOPLE" + "\n" + "=======" + "\n\n"
+        for i in range(0, 6): #for just the first 6 rows, then we need to do something different.
+            content += (self.getRoomNames()[i] + " (" + self.__rooms[i] + ")").ljust(19) + \
+                       (self.getPeopleNames()[i] + " (" + self.__people[i] + ")").ljust(21) + \
+                       (self.getWeaponNames()[i] + " (" + self.__weapons[i] + ")").ljust(17) + "\n"
 
-        people = ""
-        for i in range(0, 6):
-            people += (self.getPeopleNames()[i] + " (" + self.__people[i] + ")\n")
-
-        content += people
-        content += "\nWEAPONS" + "\n" + "========" + "\n"
-
-        weapons = ""
-        for i in range(0, 6):
-            weapons += ("\n" + self.getWeaponNames()[i] + " (" + self.__weapons[i] + ")")
-
-        content += weapons
-
-        content
+        #display the last 3 rooms:    
+        content += (self.getRoomNames()[6] + " (" + self.__rooms[6] + ")") + "\n"
+        content += (self.getRoomNames()[7] + " (" + self.__rooms[7] + ")") + "\n"
+        content += (self.getRoomNames()[8] + " (" + self.__rooms[8] + ")") + "\n"
         
         return content
         
