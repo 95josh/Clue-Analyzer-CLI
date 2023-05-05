@@ -1,12 +1,13 @@
 from enum import Enum
-#Created by Joshua Stahl for CIS156 at SMCC for his Final Project
+#Created by Joshua Stahl for CIS156 at SMCC for the Final Project
 
 
 class CluePlayer():
 
-    def __init__(self, name, rms = None, peopl = None, weap = None):
+    def __init__(self, name, cardnumbers, rms = None, peopl = None, weap = None):
 
         self.__name = name #store the name of the player
+        self.__numberofcards = cardnumbers #the number of cards the player has.
 
         # "-" means "don't know if player has it", "Y" means player has it, "
         # "N" means "player doesn't have it"
@@ -130,8 +131,15 @@ class CluePlayer():
                 self.__weapons[idx] = "-"
         else:
             raise ValueError("Index not valid")
+
+    def setNumberOfCards(self, value):
+        #sets the number of cards the player has
+        #check to see if value is reasonable
+        #minimum is 3, maximum is 11
+        if value >= 3 and value <= 11:
+            self.__numberofcards = value
         
-    #getters
+    ###############getters###############
     def dumpRooms(self):
         #dumps information for saving into file
         result = "" #setup result variable
@@ -175,11 +183,10 @@ class CluePlayer():
         return self.__rooms[idx]
 
     def getPerson(self, idx):
-        return self.__rooms[idx]
+        return self.__people[idx]
 
-    def getWeapon(self, idx):
-        return self.__rooms[idx]
-
+    def getWeapon(self, idx): 
+        return self.__weapons[idx]
 
     def getRooms(self):
         return self.__rooms
@@ -199,18 +206,23 @@ class CluePlayer():
     def getWeaponNames(self):
         return self.__weaponsdesc
 
+    def getNumberOfCards(self):
+        return self.__numberofcards
+
     def getName(self):
         return self.__name
 
     def getEverything(self):
-        return {'name':self.getName(), 'rooms':self.getRooms(), \
-                'people':self.getPeople(), 'weapons':self.getWeapons()}
-        
+        return {'name':self.getName(), 'cardnums':self.getNumberOfCards(),
+                'rooms':self.getRooms(), 'people':self.getPeople(), \
+                'weapons':self.getWeapons()}
+    
     def __str__(self):
 
-        content = "PLAYER: " + self.getName().upper() + "\n\n" + \
-               "ROOMS".ljust(19) + "PEOPLE".ljust(21) + "WEAPONS".ljust(17) + \
-               "\n" + "============".ljust(19) + "============".ljust(21) + \
+        content = "PLAYER: " + self.getName().upper() + " - Card count: " + \
+               str(self.getNumberOfCards()) + "\n\n" + "ROOMS".ljust(19) + \
+               "PEOPLE".ljust(21) + "WEAPONS".ljust(17) + "\n" + \
+               "============".ljust(19) + "============".ljust(21) + \
                "==========".ljust(17) + "\n"
 
         for i in range(0, 6): #for just the first 6 rows, then we need to do something different.
