@@ -1,6 +1,5 @@
 from clue import CluePlayer
 import json
-import os #for clearing screen
 
 #Created by Joshua Stahl for CIS156 at SMCC for the Final Project
 
@@ -157,9 +156,13 @@ def startup():
     print("CLUE ANALYZER")
     print("\nThis program was made by JOSHUA STAHL for CIS156 at SMCC.")
     print("""\nCLUE ANALYZER was made to help the user with the deductive
-reasoning process during a game of clue. Some people are challenged with
-the deductive reasoning process, (or make silly mistakes) and this program
-will help with that process.""")
+reasoning process during a game of Clue. Clue is a classic murder
+mystery game, where there is three cards hidden in an envelope.
+(The murderer, the murder weapon, and the murder location(or room)).
+This game requires a lot of deductive reasoning, and since
+some people are challenged with the deductive reasoning process,
+(or make silly mistakes), this program will help
+a user play the game.""")
     #make purpose statement here
     print("\nHello Clue player! Welcome to Clue Analyzer.")
 
