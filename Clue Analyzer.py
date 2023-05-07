@@ -74,9 +74,6 @@ def gameLoop():
         elif option == "G":
             #re-analyze
             analyzeData()
-        elif option == "H":
-            #clear screen
-            os.system('clear')
         elif option == "?":
             #display game menu
             gameloopMenu()
@@ -141,19 +138,18 @@ def saveData(mute = False, ret = False):
             print("Game saved")
         
     except Exception as e:
-        print("Unable to save data. ")
+        print("UNABLE TO SAVE DATA TO DISK")
         print(e)
 
 def gameloopMenu():
     print("\n--- GAME MENU ---")
     print("  A - LIST CURRENT PLAYERS")
-    print("  B - ADD NEW GUESS")
-    print("  C - DISPLAY DATA FOR A USER")
-    print("  D - DISPLAY ALL USERS DATA")
+    print("  B - ADD A NEW GUESS")
+    print("  C - DISPLAY INFO FOR A USER")
+    print("  D - DISPLAY ALL USERS' INFO")
     print("  E - DISPLAY GUESSES")
     print("  F - ADD/REMOVE PLAYERS' ITEMS")
     print("  G - RE-ANALYIZE DATA")
-    print("  H - CLEAR SCREEN")
     print("  ? - DISPLAY THIS MENU")
     print("  X - SAVE AND EXIT THIS GAME")
 
@@ -273,6 +269,11 @@ def updatePlayerItems():
 
     print("\nDANGER. USE AT YOUR OWN RISK. IF YOU MESS UP, \n" + \
           "THERE IS NO GOING BACK.")
+
+    print("\nBEWARE: IF YOU SAY A PLAYER HAS A CARD, THIS \n" + \
+          "WILL NOT UPDATE THE OTHER PLAYERS TO SAY THEY \n"  + \
+          "DON'T HAVE THAT CARD.")
+    
     print("\nEDIT A PLAYER'S CARD:")
     changes = False #keeps track if changes were made.
     try:
