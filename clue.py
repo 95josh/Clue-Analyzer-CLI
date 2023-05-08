@@ -237,9 +237,3 @@ class CluePlayer():
         
         return content
         
-
-        
-                            
-
-    
-

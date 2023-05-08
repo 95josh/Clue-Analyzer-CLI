@@ -960,7 +960,7 @@ def mysteryCardCheck():
     if secretroom and secretperson and secretweapon:
         print("\n######  YOU CAN MAKE YOUR GUESS ON THE SECRET CARDS!  ######\n")
 
-def AnalysisSetRoom(guess, counter):
+def AnalysisSetRoom(guess, discoveries):
     #This function takes a guess and makes the necessary changes
     #to it. It sets the guessed room to yes for the shower
     #and the others to no.
@@ -972,54 +972,69 @@ def AnalysisSetRoom(guess, counter):
     shower = guess[4] #the shower
 
     if players[shower].getRoom(groom) != "Y": #this means this has not been discovered before.
-        counter += 1 #increment counter
+        discoveries.append([shower, 0, groom]) #add item to list of discoveries
         
     players[shower].setRoom(groom, "Y") #set room to yes for shower
     setOthers(shower, 0, groom, "N") #the others don't have the room
     guess[5] = [0, groom] #set the shown card in the guess
 
-    return (guess, counter) #return a tuple.
+    return (guess, counter, discoveries) #return a tuple.
 
-def AnalysisSetPerson(guess, counter):
+def AnalysisSetPerson(guess, discoveries):
     #This function takes a guess and makes the necessary changes
     #to it. It sets the guessed person to yes for the shower
     #and the others to no.
     
     guesser = guess[0] #the guesser
-    groom = guess[1] #the guessed room
     gperson = guess[2] #the guessed person
-    gweapon = guess[3] #the guessed weapon
     shower = guess[4] #the shower
 
     if players[shower].getPerson(gperson) != "Y": #this means this has not been discovered before.
-        counter += 1 #increment counter
+        discoveries.append([shower, 1, gperson]) #add item to list of discoveries
         
     players[shower].setPerson(gperson, "Y") #set person to yes for shower
     setOthers(shower, 1, gperson, "N") #the others don't have the person
     guess[5] = [1, gperson] #set the shown card in the guess
 
-    return (guess, counter) #return a tuple.
+    return (guess, counter, discoveries) #return a tuple.
 
-def AnalysisSetWeapon(guess, counter):
+def AnalysisSetWeapon(guess, discoveries):
     #This function takes a guess and makes the necessary changes
     #to it. It sets the guessed weapon to yes for the shower
     #and the others to no.
     
     guesser = guess[0] #the guesser
-    groom = guess[1] #the guessed room
-    gperson = guess[2] #the guessed person
     gweapon = guess[3] #the guessed weapon
     shower = guess[4] #the shower
 
     if players[shower].getWeapon(gweapon) != "Y": #this means this has not been discovered before.
-        counter += 1 #increment counter
-    
+        discoveries.append([shower, 2, gweapon]) #add item to list of discoveries
+        
     players[shower].setWeapon(gweapon, "Y") #set weapon to yes for shower
     setOthers(shower, 2, gweapon, "N") #the others don't have the weapon
     guess[5] = [2, gweapon] #set the shown card in the guess
 
-    return (guess, counter) #return a tuple.
+    return (guess, discoveries) #return a tuple.
 
+def displayDiscoveries(discoveries):
+    for discov in discoveries:
+            #figure out what the middle text of the print statement should be
+            #based on what was discovered. Also figure out name of what was
+            #discovered
+            if discov[1] == 0:
+                #a room was discovered
+                middle = " has the "
+                itemname = roomnames[discov[2]]
+            elif discov[1] == 1:
+                #a person was discovered
+                middle = " has "
+                itemname = peoplenames[discov[2]]
+            elif discov[1] == 2:
+                #a weapon was discovered
+                middle = " has the "
+                itemname = weaponnames[discov[2]]
+                
+            print(players[discov[0]].getName() + middle + itemname)
 
 def analyzeData(mute = True):
     #this function performs advanced analysis on the guesses.
@@ -1039,7 +1054,9 @@ def analyzeData(mute = True):
         shower = guess[4] #the shower
         
             
-        if guess[4] != len(players): #make sure the guess is not no-one.      
+        if guess[4] != len(players): #make sure the guess is not no-one.
+
+            discoveries = [] #a list to hold the discoveries (if any)
             
             otherroom = playersHaveExcept(0, groom, shower) #if a user has the room, except for shower
             otherperson = playersHaveExcept(1, gperson, shower) #if a user has the person, except for shower
@@ -1054,19 +1071,19 @@ def analyzeData(mute = True):
             #then the shower has the weapon
             if otherroom and otherperson:
                 #set the weapon to true for the shower and so on.
-                guess, counter = AnalysisSetWeapon(guess, counter)
+                guess, discoveries = AnalysisSetWeapon(guess, discoveries)
                 
             #if other people besides the shower have the room and weapon
             #then the shower has the person
             elif otherroom and otherweapon:
                 #set the person to true for the shower and so on.
-                guess, counter = AnalysisSetPerson(guess, counter)
+                guess, discoveries = AnalysisSetPerson(guess, discoveries)
 
             #if other people besides the shower have the person and weapon
             #then the shower has the room
             elif otherperson and otherweapon:
                 #set the room to true for the shower and so on.
-                guess, counter = AnalysisSetRoom(guess, counter)
+                guess, discoveries = AnalysisSetRoom(guess, discoveries)
 
 
             #*************** CHECK WHAT THE SHOWER DOESN'T HAVE AND WHAT THE OTHERS DO ***********#
@@ -1076,37 +1093,37 @@ def analyzeData(mute = True):
             #the person then shower has the weapon
             elif notHave(shower, 0, groom) and otherperson:
                 #set the weapon to true for the shower and so on.
-                guess, counter = AnalysisSetWeapon(guess, counter)               
+                guess, discoveries = AnalysisSetWeapon(guess, discoveries)             
 
             #if the shower doesn't have the room, and other people have
             #the weapon then shower has the person
             elif notHave(shower, 0, groom) and otherweapon:
                 #set the person to true for the shower and so on.
-                guess, counter = AnalysisSetPerson(guess, counter)
+                guess, discoveries = AnalysisSetPerson(guess, discoveries)
 
             #if the shower doesn't have the person, and other people have
             #the room then shower has the weapon
             elif notHave(shower, 1, gperson) and otherroom:
                 #set the weapon to true for the shower and so on.
-                guess, counter = AnalysisSetWeapon(guess, counter)
+                guess, discoveries = AnalysisSetWeapon(guess, discoveries)
 
             #if the shower doesn't have the person, and other people have
             #the weapon then shower has the room
             elif notHave(shower, 1, gperson) and otherweapon:
                 #set the room to true for the shower and so on.
-                guess, counter = AnalysisSetRoom(guess, counter)
+                guess, discoveries = AnalysisSetRoom(guess, discoveries)
 
             #if the shower doesn't have the weapon, and other people have
             #the room then shower has the person
             elif notHave(shower, 2, gweapon) and otherroom:
                 #set the person to true for the shower and so on.
-                guess, counter = AnalysisSetPerson(guess, counter)
+                guess, discoveries = AnalysisSetPerson(guess, discoveries)
 
             #if the shower doesn't have the weapon, and other people have
             #the person then shower has the room
             elif notHave(shower, 2, gweapon) and otherperson:
                 #set the room to true for the shower and so on.
-                guess, counter = AnalysisSetRoom(guess, counter)
+                guess, discoveries = AnalysisSetRoom(guess, discoveries)
 
 
             #*************** CHECK WHAT THE SHOWER DOESN'T HAVE ****************#
@@ -1115,27 +1132,35 @@ def analyzeData(mute = True):
             #then shower has the weapon
             elif notHave(shower, 0, groom) and notHave(shower, 1, gperson):
                 #set the weapon to true for the shower and so on.
-                guess, counter = AnalysisSetWeapon(guess, counter)
+                guess, discoveries = AnalysisSetWeapon(guess, discoveries)
 
             #if the shower doesn't have the room nor the weapon
             #then shower has the person
             elif notHave(shower, 0, groom) and notHave(shower, 2, gweapon):
                 #set the person to true for the shower and so on.
-                guess, counter = AnalysisSetPerson(guess, counter)
+                guess, discoveries = AnalysisSetPerson(guess, discoveries)
 
             #if the shower doesn't have the person nor the weapon
             #then shower has the room
             elif notHave(shower, 1, gperson) and notHave(shower, 2, gweapon):
                 #set the room to true for the shower and so on.
-                guess, counter = AnalysisSetRoom(guess, counter)
+                guess, discoveries = AnalysisSetRoom(guess, discoveries)
             
     #card count analysis:
     cardCountAnalysis()
 
     #mystery card check:
     mysteryCardCheck()
-    
-    print("Finished Analyzing: {0} new discoveries".format(counter))
+
+    if len(discoveries) == 1: #count for printing anomaly
+        print("Finished Analyzing: 1 new discovery")
+        displayDiscoveries(discoveries)
+    else: #everything else
+        print("Finished Analyzing: {0} new discoveries".format(len(discoveries)))
+        #loop through the discoveries:
+        displayDiscoveries(discoveries)
+        
+        
     saveData(mute) #muted save data, takes input from user.
 
 def returnCardsHave(player):
@@ -1274,6 +1299,4 @@ def cardCountAnalysis():
             print("ALL INFORMATION IS KNOWN ABOUT {0}".format(player.getName()))        
 
         
-
 main()
-
