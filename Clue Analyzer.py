@@ -103,6 +103,11 @@ def readData():
         for guess in results['guesses']:
             guesses.append(guess)
 
+        #primary basic analyze guesses before analysis:
+        #loop through all the guesses
+        for guess in guesses:
+            postAddBasicAnalysis(guess) #does basic analysis, like who shouldn't have what based on the guesses.
+
         analyzeData()
         
         return True 
@@ -876,7 +881,7 @@ def notHave(player, category, index):
 
     return False #player didn't not have the card, so return false.
 
-def mysteryCardCheck():
+def mysteryCardCheck(mute = False):
     #this function checks for a singular card in each of the
     #categories that no one has. If there is more than one card
     #that no one has in a category, this function does nothing.
@@ -890,6 +895,7 @@ def mysteryCardCheck():
     secretroom = False #if the murder location has been found
     secretperson = False #if the murderer has been found
     secretweapon = False #if the murder weapon has been found
+    newdiscovery = False #if there was a new discovery (if a secret card was found)
 
     #check the rooms
     roomlist = [] #a list of index numbers of the rooms that no one has
@@ -900,8 +906,10 @@ def mysteryCardCheck():
     #check to see if there is one room no one has.
     #(that room is the murder location)
     if len(roomlist) == 1:
-        setEveryone(0, roomlist[0], "N") #no one will have this room.
-        secretroom = True
+        if not noOneHas(0, roomlist[0]): #if the murder location hasn't been figured out yet, then new discovery.
+            newdiscovery = True
+            setEveryone(0, roomlist[0], "N") #no one will have this room.
+            secretroom = True
 
 
     #check the people
@@ -913,8 +921,10 @@ def mysteryCardCheck():
     #check to see if there is one person no one has.
     #(that person is the murderer)
     if len(peoplelist) == 1:
-        setEveryone(1, peoplelist[0], "N") #no one will have this person.
-        secretperson = True
+        if not noOneHas(1, peoplelist[0]): #if the murderer hasn't been figured out yet, then new discovery.
+            newdiscovery = True  
+            setEveryone(1, peoplelist[0], "N") #no one will have this person.
+            secretperson = True
 
 
     #check the weapons
@@ -926,15 +936,21 @@ def mysteryCardCheck():
     #check to see if there is one weapon no one has.
     #(that weapon is the murder weapon)
     if len(weaponlist) == 1:
-        setEveryone(2, weaponlist[0], "N") #no one will have this weapon.
-        secretweapon = True
+        if not noOneHas(2, weaponlist[0]): #if the murder weapon hasn't been figured out yet, then new discovery.
+            newdiscovery = True
+            setEveryone(2, weaponlist[0], "N") #no one will have this weapon.
+            secretweapon = True
+            
 
+    #if there is a new discovery, reanalyze data:
+    if newdiscovery:
+        analyzeData(True, True)    
 
     #check to see if there is a card that no one has
 
     #check every room:
     for i in range(0, 9):
-        if noOneHas(0, i):
+        if noOneHas(0, i) and not mute:
             print(roomnames[i] + " is the murder location...")
             secretroom = True #found murder location
             break #no need to loop any more, found murder location
@@ -942,7 +958,7 @@ def mysteryCardCheck():
 
     #check every person:
     for i in range(0, 6):
-        if noOneHas(1, i):
+        if noOneHas(1, i) and not mute:
             print(peoplenames[i] + " is the murderer...")
             secretperson = True #found the murderer
             break #no need to loop any more, found the murderer
@@ -950,14 +966,14 @@ def mysteryCardCheck():
 
     #check every weapon:
     for i in range(0, 6):
-        if noOneHas(2, i):
+        if noOneHas(2, i) and not mute:
             print(weaponnames[i] + " is the murder weapon...")
             secretweapon = True #found the murder weapon
             break #no need to loop any more, found the murder weapon
     
     
     #if all the secret items are found
-    if secretroom and secretperson and secretweapon:
+    if secretroom and secretperson and secretweapon and not mute:
         print("\n######  YOU CAN MAKE YOUR GUESS ON THE SECRET CARDS!  ######\n")
 
 def AnalysisSetRoom(guess, discoveries):
@@ -1036,7 +1052,7 @@ def displayDiscoveries(discoveries):
                 
             print(players[discov[0]].getName() + middle + itemname)
 
-def analyzeData(mute = True):
+def analyzeData(savemute = True, mute = False):
     #this function performs advanced analysis on the guesses.
     #the idea is to try to find out the card shower's card he/she
     #showed.
@@ -1052,7 +1068,6 @@ def analyzeData(mute = True):
         gperson = guess[2] #the guessed person
         gweapon = guess[3] #the guessed weapon
         shower = guess[4] #the shower
-        
             
         if guess[4] != len(players): #make sure the guess is not no-one.
 
@@ -1150,15 +1165,22 @@ def analyzeData(mute = True):
     cardCountAnalysis()
 
     #mystery card check:
-    mysteryCardCheck()
+    mysteryCardCheck(mute)
 
-    if len(discoveries) == 1: #count for printing anomaly
-        print("Finished Analyzing: 1 new discovery")
+    if len(discoveries) >= 1 and not mute: #count for printing anomaly (as long as not mute)
+        if len(discoveries) == 1: #first type of printing
+            print("Finished Analyzing: 1 new discovery")           
+        else: #other type of printing (> 1)
+            print("Finished Analyzing: {0} new discoveries".format(len(discoveries)))
+            
         displayDiscoveries(discoveries)
-    else: #everything else
-        print("Finished Analyzing: {0} new discoveries".format(len(discoveries)))
-        #loop through the discoveries:
-        displayDiscoveries(discoveries)
+        print("Re-analyzing") #to inform user.
+        analyzeData() #reanalyze data because something was found
+    elif len(discoveries) >= 1 and mute: #count for printing anomaly (while mute)
+        analyzeData(True, True) #reanalyze data because something was found
+    elif not mute: #if len(discoveries) is zero and not mute
+        print("Finished Analyzing: 0 new discoveries")
+                
         
         
     saveData(mute) #muted save data, takes input from user.
@@ -1264,6 +1286,7 @@ def cardCountAnalysis():
         if (len(cardshave) == player.getNumberOfCards()) and (len(unknowncards) > 0):
             setRestOfCardsToNo(player, cardshave)
             print("ALL INFORMATION IS KNOWN ABOUT {0}".format(player.getName()))
+            analyzeData(True, True) #reanalyze data since something new was found out.
 
         #if the number of unknown cards the user has plus the
         #number of cards the user has equals the number of cards
@@ -1296,7 +1319,53 @@ def cardCountAnalysis():
             cardshave = returnCardsHave(player) #get new list of cardshave, since we updated it.
             
             #tell the user what just happened
-            print("ALL INFORMATION IS KNOWN ABOUT {0}".format(player.getName()))        
+            print("ALL INFORMATION IS KNOWN ABOUT {0}".format(player.getName()))
+            analyzeData(True, True) #reanalyze data since something new was found out.
+
+
+def postAddBasicAnalysis(guess):
+    #function does the basic analysis.
+
+    guesser = guess[0]
+    playershowed = guess[4]
+    roomid = guess[1]
+    personid = guess[2]
+    weaponid = guess[3]
+    cardshowedCat = guess[5][0]
+    cardshowedIndex = guess[5][1]
+    
+    basicEditOnGuess(guesser, playershowed, roomid, personid, weaponid)
+
+    #if the guesser is the user of this program and someone
+    #actually showed a card, then ask which card was shown.
+    if guesser == 0 and playershowed != len(players):
+
+        if cardshowedCat == 0:
+            #user got shown a room
+
+            #add "Y" to card shower for the room
+            players[playershowed].setRoom(roomid, "Y")
+
+            #set the other players to N
+            setOthers(playershowed, 0, roomid, "N")
+            
+        elif cardshowedCat == 1:
+            #user got shown a person
+
+            #add "Y" to card shower for the person
+            players[playershowed].setPerson(personid, "Y")
+
+            #set the other players to N
+            setOthers(playershowed, 1, personid, "N")
+            
+        else:
+            #user got shown a weapon
+
+            #add "Y" to card shower for the weapon
+            players[playershowed].setWeapon(weaponid, "Y")
+
+            #set the other players to N
+            setOthers(playershowed, 2, weaponid, "N")
 
         
 main()
