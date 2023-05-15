@@ -978,7 +978,7 @@ def AnalysisSetRoom(guess, discoveries):
     setOthers(shower, 0, groom, "N") #the others don't have the room
     guess[5] = [0, groom] #set the shown card in the guess
 
-    return (guess, counter, discoveries) #return a tuple.
+    return (guess, discoveries) #return a tuple.
 
 def AnalysisSetPerson(guess, discoveries):
     #This function takes a guess and makes the necessary changes
@@ -996,7 +996,7 @@ def AnalysisSetPerson(guess, discoveries):
     setOthers(shower, 1, gperson, "N") #the others don't have the person
     guess[5] = [1, gperson] #set the shown card in the guess
 
-    return (guess, counter, discoveries) #return a tuple.
+    return (guess, discoveries) #return a tuple.
 
 def AnalysisSetWeapon(guess, discoveries):
     #This function takes a guess and makes the necessary changes
