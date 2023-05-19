@@ -625,7 +625,6 @@ def addGuess():
         while (playershowed < 0 or playershowed > (len(players) -1 )) and playershowed != len(players):
             playershowed = int(input("Who showed a card?: "))
 
-        basicEditOnGuess(guesser, playershowed, roomid, personid, weaponid)
 
         #default category and index (used in storing shown card in guesses):
         categoryID = 10
@@ -728,6 +727,8 @@ def addGuess():
 
             #advanced analysis:
             analyzeData() #save data is included, False or blank = display "data saved" message
+
+            basicEditOnGuess(guesser, playershowed, roomid, personid, weaponid)
 
         else:
             print("Guess not added.")
@@ -1177,6 +1178,7 @@ def analyzeData(savemute = True, mute = False):
         print("Re-analyzing") #to inform user.
         analyzeData() #reanalyze data because something was found
     elif len(discoveries) >= 1 and mute: #count for printing anomaly (while mute)
+        displayDiscoveries(discoveries)
         analyzeData(True, True) #reanalyze data because something was found
     elif not mute: #if len(discoveries) is zero and not mute
         print("Finished Analyzing: 0 new discoveries")
