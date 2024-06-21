@@ -2,6 +2,8 @@
 
 MADE BY JOSHUA STAHL AT SOUTH MOUNTAIN COMMUNITY COLLEGE FOR CIS156 FINAL PROJECT.
 
+CLI created with Python. To see Windows GUI version application see 
+
 CLUE ANALYZER was made to help the user with the deductive
 reasoning process during a game of Clue. Clue is a classic murder
 mystery game, where there is three cards hidden in an envelope.
